@@ -14,16 +14,27 @@ public class LoginTest {
 
 
     public static DriverRule driverRule = new DriverRule();
+    private final UserClient client = new UserClient();
+    private LoginPage objLoginPage;
+    private MainPage objMainPage;
+    private HeaderPage objHeaderPage;
+    private RegistrationPage objRegistrationPage;
+    private ForgotPasswordPage objForgotPasswordPage;
 
     @Before
     public void startUp() {
         driverRule.initDriver();
+        WebDriver driver = driverRule.getDriver();
+        objLoginPage = new LoginPage(driver);
+        objMainPage = new MainPage(driver);
+        objHeaderPage = new HeaderPage(driver);
+        objRegistrationPage = new RegistrationPage(driver);
+        objForgotPasswordPage = new ForgotPasswordPage(driver);
     }
 
     @After
     public void tearDown() {
         driverRule.getDriver().quit();
-        //        11. Удалить пользователя, если создался через API
     }
 
     @Test
@@ -31,90 +42,52 @@ public class LoginTest {
     public void userSuccessfulLoginTest() {
 
         User user = User.random();
-        UserClient client = new UserClient();
         ValidatableResponse createResponse = client.createUser(user);
-        String accessToken = client.getUserAccessToken(createResponse);
 
+        objLoginPage.goToLoginPage();
+        objLoginPage.sendLoginForm(user);
+        objMainPage.checkGoToMainPageLoggedIn();
 
-        WebDriver driver = driverRule.getDriver();
-        LoginPage objLoginPage = new LoginPage(driver);
-        MainPage objMainPage = new MainPage(driver);
-
-
-        objLoginPage.open();
-        objLoginPage.waitForLoginPageToAppear();
-        objLoginPage.enterEmail(user.getEmail());
-        objLoginPage.enterPassword(user.getPassword());
-        objLoginPage.clickLoginButton();
-        objMainPage.waitForConstructorToAppear();
-        objMainPage.checkCurrentUrl();
-        objMainPage.waitForMakeOrderButtonToAppear();
-
-        client.deleteUser(accessToken);
-
+        client.getUserTokenAndDeleteUser(createResponse);
     }
 
     @Test
-    @DisplayName("вход по кнопке «Войти в аккаунт» на главной")
+    @DisplayName("Переход на страницу логина по кнопке «Войти в аккаунт» на главной")
     public void userLoginButtonOnMainPageTest() {
 
-        WebDriver driver = driverRule.getDriver();
-        LoginPage objLoginPage = new LoginPage(driver);
-        MainPage objMainPage = new MainPage(driver);
-
-        objMainPage.open();
+        objMainPage.goToMainPage();
         objMainPage.clickEnterAccountButton();
-        objLoginPage.waitForLoginPageToAppear();
-        objLoginPage.checkCurrentUrl();
+        objLoginPage.checkGoToLoginPage();
 
     }
 
     @Test
-    @DisplayName("вход через кнопку «Личный кабинет»")
+    @DisplayName("Переход на страницу логина по кнопке «Личный кабинет» на главной")
     public void userLoginButtonOnHeaderTest() {
 
-        WebDriver driver = driverRule.getDriver();
-        LoginPage objLoginPage = new LoginPage(driver);
-        MainPage objMainPage = new MainPage(driver);
-        HeaderPage objHeaderPage = new HeaderPage(driver);
-
-        objMainPage.open();
-        objMainPage.waitForConstructorToAppear();
+        objMainPage.goToMainPage();
         objHeaderPage.clickProfileButton();
-        objLoginPage.waitForLoginPageToAppear();
-        objLoginPage.checkCurrentUrl();
+        objLoginPage.checkGoToLoginPage();
 
     }
 
     @Test
-    @DisplayName("вход через кнопку в форме регистрации,")
+    @DisplayName("Переход на страницу логина по кнопке «Войти» на форме регистрации")
     public void userLoginButtonOnRegistrationPageTest() {
 
-        WebDriver driver = driverRule.getDriver();
-        LoginPage objLoginPage = new LoginPage(driver);
-        RegistrationPage objRegistrationPage = new RegistrationPage(driver);
-
-        objRegistrationPage.open();
-        objRegistrationPage.checkForRegistrationButtonToAppear();
+        objRegistrationPage.goToRegistrationPage();
         objRegistrationPage.clickLoginButton();
-        objLoginPage.waitForLoginPageToAppear();
-        objLoginPage.checkCurrentUrl();
+        objLoginPage.checkGoToLoginPage();
 
     }
 
     @Test
-    @DisplayName("вход через кнопку в форме восстановления пароля.")
+    @DisplayName("Переход на страницу логина по кнопке «Войти» на форме восстановления пароля.")
     public void userLoginButtonOnForgotPasswordPageTest() {
 
-        WebDriver driver = driverRule.getDriver();
-        LoginPage objLoginPage = new LoginPage(driver);
-        ForgotPasswordPage objForgotPasswordPage = new ForgotPasswordPage(driver);
-
-        objForgotPasswordPage.open();
-        objForgotPasswordPage.waitForLoginButtonToAppear();
+        objForgotPasswordPage.goToForgotPasswordPage();
         objForgotPasswordPage.clickLoginButton();
-        objLoginPage.waitForLoginPageToAppear();
-        objLoginPage.checkCurrentUrl();
+        objLoginPage.checkGoToLoginPage();
 
     }
 

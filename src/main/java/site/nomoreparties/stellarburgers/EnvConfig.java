@@ -18,7 +18,7 @@ public class EnvConfig {
     public static final String LOGIN_PAGE_PATH = BASE_URI + "/login";
     public static final String PROFILE_PAGE_PATH = BASE_URI + "/account/profile";
     public static final String FORGOT_PASS_PAGE_PATH = BASE_URI + "/forgot-password";
-    public static final int DEFAULT_TIMEOUT = 5;
+    public static final int DEFAULT_TIMEOUT = 15;
 }
 
 

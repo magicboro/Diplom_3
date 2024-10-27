@@ -22,36 +22,13 @@ public class UserClient {
     }
 
     @Step("Login user by method : " + EnvConfig.USER_LOGIN_PATH)
-    public ValidatableResponse loginUser(UserCredentials credentials) {
+    public ValidatableResponse loginUserByCreds(UserCredentials credentials) {
         return given().log().all()
                 .contentType(ContentType.JSON)
                 .baseUri(EnvConfig.BASE_URI)
                 .body(credentials)
                 .when()
                 .post(EnvConfig.USER_LOGIN_PATH)
-                .then().log().all();
-    }
-
-    @Step("Change user data by method with AUTH: " + EnvConfig.USER_PATH)
-    public ValidatableResponse changeUserCredentialsWithAuth(User user, String accessToken) {
-        return given()
-                .contentType(ContentType.JSON)
-                .baseUri(EnvConfig.BASE_URI)
-                .auth().oauth2(accessToken)
-                .body(user)
-                .when()
-                .patch(EnvConfig.USER_PATH)
-                .then().log().all();
-    }
-
-    @Step("Change user data by method without AUTH: " + EnvConfig.USER_PATH)
-    public ValidatableResponse changeUserCredentialsWithoutAuth(User user) {
-        return given()
-                .contentType(ContentType.JSON)
-                .baseUri(EnvConfig.BASE_URI)
-                .body(user)
-                .when()
-                .patch(EnvConfig.USER_PATH)
                 .then().log().all();
     }
 
@@ -72,5 +49,26 @@ public class UserClient {
                 .path("accessToken");
         return accessTokenWithBearer.replace("Bearer ", "");
     }
+
+    @Step("Get user refreshToken")
+    public String getUserRefreshToken(ValidatableResponse createResponse) {
+        String refreshToken = createResponse
+                .extract()
+                .path("refreshToken");
+        return refreshToken;
+    }
+
+    @Step("Get token an delete")
+    public void getUserTokenAndDeleteUser(ValidatableResponse createResponse) {
+        String accessToken = getUserAccessToken(createResponse);
+        deleteUser(accessToken);
+    }
+
+    @Step("Get login response")
+    public ValidatableResponse getLoginResponse(User user) {
+        UserCredentials userCredentials = UserCredentials.fromUser(user);
+        return loginUserByCreds(userCredentials);
+    }
+
 
 }

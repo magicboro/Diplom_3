@@ -7,6 +7,8 @@ public class User {
     private final String email;
     private final String password;
     private final String name;
+    static String userKey = RandomStringUtils.randomAlphabetic(5,15);
+    static String shortPassword = RandomStringUtils.randomAlphanumeric(5);
 
     public User(String email, String password, String name) {
         this.email = email;
@@ -15,24 +17,11 @@ public class User {
     }
 
     public static User random() {
-        String userKey = RandomStringUtils.randomAlphabetic(5,15);
         return new User(userKey + "__@yandex.ru", userKey + "__123QweЙцу!@#", userKey);
     }
 
-    static User emptyEmail() {
-        return new User("", "password", "имя");
-    }
-
-    static User emptyPassword() {
-        return new User("email", "", "имя");
-    }
-
-    static User emptyName() {
-        return new User("email", "password", "");
-    }
-
-    static User emptyAllFields() {
-        return new User("", "", "");
+    public static User shortPassword() {
+        return new User(userKey + "__@yandex.ru", shortPassword, userKey);
     }
 
     public String getEmail() {
